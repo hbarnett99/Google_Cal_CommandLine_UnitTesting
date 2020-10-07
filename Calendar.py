@@ -23,7 +23,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 
 def get_calendar_api():
@@ -54,34 +54,74 @@ def get_calendar_api():
     return build('calendar', 'v3', credentials=creds)
 
 
-def get_upcoming_events(api, starting_time, number_of_events):
+def get_upcoming_events(api, current_time, number_of_events):
     """
     Shows basic usage of the Google Calendar API.
     Prints the start and name of the next n events on the user's calendar.
     """
-    if (number_of_events <= 0):
+    if number_of_events <= 0:
         raise ValueError("Number of events must be at least 1.")
 
-    events_result = api.events().list(calendarId='primary', timeMin=starting_time,
+    events_result = api.events().list(calendarId='primary', timeMin=current_time,
                                       maxResults=number_of_events, singleEvents=True,
                                       orderBy='startTime').execute()
+
     return events_result.get('items', [])
-    
+
     # Add your methods here.
+
+
+def get_past_events(api, current_time, number_of_events):
+
+    if number_of_events <= 0:
+        raise ValueError("Number of events must be at least 1.")
+    events_result = api.events().list(calendarId='primary', timeMax=current_time,
+                                      maxResults=number_of_events, singleEvents=True,
+                                      orderBy='startTime').execute()
+
+    return events_result.get('items', [])
+
+
+def get_reminders(event):
+    reminders = event.get('reminders', []).get('overrides')
+
+    if not reminders:
+        print("default reminder here")  # if using a default reminder, should we insert the reminder or leave it?
+    else:
+        for reminder in reminders:
+            print(reminder.get('method') + " " + str(reminder.get('minutes'))
+                  + " minutes before " + event['summary'] + ' starts')
+
+
+def delete_event(api, event_id):
+    api.events().delete(calendarId='primary', eventId=event_id).execute()
 
 
 def main():
     api = get_calendar_api()
     time_now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
 
-    events = get_upcoming_events(api, time_now, 10)
+    upcoming_events = get_upcoming_events(api, time_now, 10)
+    past_events = get_past_events(api, time_now, 10)
 
-    if not events:
+    if not upcoming_events:
         print('No upcoming events found.')
-    for event in events:
+    for event in upcoming_events:
         start = event['start'].get('dateTime', event['start'].get('date'))
         print(start, event['summary'])
+        get_reminders(event)
+
+    if not past_events:
+        print('No upcoming events found.')
+    for event in past_events:
+        start = event['start'].get('dateTime', event['start'].get('date'))
+        print(start, event['summary'])
+        get_reminders(event)
+
+    # delete_event(api, "2r6goo3sgplfjs5lkmgeupt5s9")
 
 
 if __name__ == "__main__":  # Prevents the main() function from being called by the test suite runner
     main()
+
+
