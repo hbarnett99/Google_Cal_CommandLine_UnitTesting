@@ -30,8 +30,75 @@ class CalendarTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             Calendar.get_upcoming_events(mock_api, time, num_events)
 
-    def test_no_upcoming_events(self):
+    def test_no_events_returned(self):
+        events = []
+        message = "No upcoming events found."
 
+        self.assertEqual(Calendar.events_output(events), message)
+
+
+    def test_valid_upcoming_event_output_with_default_reminders(self):
+        event = [{
+            'summary': 'Google I/O 2015',
+            'location': '800 Howard St., San Francisco, CA 94103',
+            'description': 'A chance to hear more about Google\'s developer products.',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'recurrence': [
+                'RRULE:FREQ=DAILY;COUNT=2'
+            ],
+            'attendees': [
+                {'email': 'lpage@example.com'},
+                {'email': 'sbrin@example.com'},
+            ],
+            'reminders': {
+                'useDefault': True,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }]
+        self.assertEqual("2015-05-28T09:00:00-07:00 Google I/O 2015\n", Calendar.events_output(event))
+
+
+    def test_valid_upcoming_event_output_with_set_reminders(self):
+        event = [{
+            'summary': 'Google I/O 2015',
+            'location': '800 Howard St., San Francisco, CA 94103',
+            'description': 'A chance to hear more about Google\'s developer products.',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'recurrence': [
+                'RRULE:FREQ=DAILY;COUNT=2'
+            ],
+            'attendees': [
+                {'email': 'lpage@example.com'},
+                {'email': 'sbrin@example.com'},
+            ],
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }]
+        self.assertEqual("2015-05-28T09:00:00-07:00 Google I/O 2015\n" +
+                         "email 1440 minutes before Google I/O 2015 starts\n" +
+                         "popup 10 minutes before Google I/O 2015 starts\n", Calendar.events_output(event))
 
 
     def test_get_past_events_number(self):

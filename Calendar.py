@@ -65,7 +65,6 @@ def get_upcoming_events(api, current_time, number_of_events):
     events_result = api.events().list(calendarId='primary', timeMin=current_time,
                                       maxResults=number_of_events, singleEvents=True,
                                       orderBy='startTime').execute()
-
     return events_result.get('items', [])
 
     # Add your methods here.
@@ -82,15 +81,35 @@ def get_past_events(api, current_time, number_of_events):
     return events_result.get('items', [])
 
 
+def events_output(events):
+    message = ""
+    if not events:
+        message = 'No upcoming events found.'
+        return message
+        # print('No upcoming events found.')
+
+    for event in events:
+        start = event['start'].get('dateTime', event['start'].get('date'))
+        message += start + " " + event['summary'] + "\n" + get_reminders(event)
+
+        # print(start, event['summary'])
+
+    return message
+
+
 def get_reminders(event):
     reminders = event.get('reminders', []).get('overrides')
+    message = ""
+    if not reminders or event.get('reminders', []).get('useDefault') is True:
 
-    if not reminders:
-        print("default reminder here")  # if using a default reminder, should we insert the reminder or leave it?
+        # message = "default reminder"
+        return message
     else:
         for reminder in reminders:
-            print(reminder.get('method') + " " + str(reminder.get('minutes'))
-                  + " minutes before " + event['summary'] + ' starts')
+            message += reminder.get('method') + " " + str(reminder.get('minutes')) + " minutes before " \
+                       + event['summary'] + ' starts' + "\n"
+
+    return message
 
 
 def delete_event(api, event_id):
@@ -104,19 +123,8 @@ def main():
     upcoming_events = get_upcoming_events(api, time_now, 10)
     past_events = get_past_events(api, time_now, 10)
 
-    if not upcoming_events:
-        print('No upcoming events found.')
-    for event in upcoming_events:
-        start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
-        get_reminders(event)
-
-    if not past_events:
-        print('No upcoming events found.')
-    for event in past_events:
-        start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
-        get_reminders(event)
+    print(events_output(upcoming_events))
+    print(events_output(past_events))
 
     # delete_event(api, "2r6goo3sgplfjs5lkmgeupt5s9")
 
