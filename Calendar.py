@@ -109,7 +109,21 @@ def get_reminders(event):
             message += reminder.get('method') + " " + str(reminder.get('minutes')) + " minutes before " \
                        + event['summary'] + ' starts' + "\n"
 
-    return message
+    return message.get('items', [])
+
+def get_searched_event(api, searchString):
+
+    # User Story #4
+    # Allows the user to search for events via key words
+    # searching for reminders yet to be implemented
+    # Currently does not work
+    
+    if not searchString:
+        raise ValueError("Search string cannot be null. Please enter a valid search string")
+
+    search_results = api.events().list(calendarId='primary', q=searchString).execute()
+
+    return search_results.get('items', [])
 
 
 def delete_event(api, event_id):
@@ -123,8 +137,11 @@ def main():
     upcoming_events = get_upcoming_events(api, time_now, 10)
     past_events = get_past_events(api, time_now, 10)
 
+    searched_events = get_searched_event(api, "virtual")
+
     print(events_output(upcoming_events))
     print(events_output(past_events))
+    print(events_output(searched_events))
 
     # delete_event(api, "2r6goo3sgplfjs5lkmgeupt5s9")
 
