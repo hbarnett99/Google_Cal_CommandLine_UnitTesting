@@ -88,9 +88,17 @@ def events_output(events):
         return message
         # print('No upcoming events found.')
 
+
+    
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
-        message += start + " " + event['summary'] + "\n" + get_reminders(event)
+
+        #Unformatted String Concatonator
+        #message += start + " " + event['summary'] + "\n" + get_reminders(event)
+
+        #Formatted the String to be more readable
+        message += start.replace("T", "  ").replace(":00+10:00", " (AEST)").replace(":00+11:00", " (AEDT)") + "  " + \
+            event['summary'] + "\n" + get_reminders(event)
 
         # print(start, event['summary'])
 
@@ -116,7 +124,6 @@ def get_searched_event(api, searchString):
     # User Story #4
     # Allows the user to search for events via key words
     # searching for reminders yet to be implemented
-    # Currently does not work
     
     if not searchString:
         raise ValueError("Search string cannot be null. Please enter a valid search string")
@@ -136,8 +143,8 @@ def main():
 
     upcoming_events = get_upcoming_events(api, time_now, 10)
     past_events = get_past_events(api, time_now, 10)
-
-    searched_events = get_searched_event(api, "virtual")
+    
+    searched_events = get_searched_event(api, "Event")
 
     print(events_output(upcoming_events))
     print(events_output(past_events))
