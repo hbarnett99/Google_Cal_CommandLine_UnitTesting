@@ -131,6 +131,7 @@ def get_searched_event(api, searchString):
 
 def delete_event(api, event_id):
     api.events().delete(calendarId='primary', eventId=event_id).execute()
+    
 
 
 def main():
@@ -148,12 +149,12 @@ def main():
     time_now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
 
     if value == 1:
-        print("Your upcoming events are:")
+        print("\nYour upcoming events are:")
         upcoming_events = get_upcoming_events(api, time_now, 10)
         print(events_output(upcoming_events))
 
     elif value == 2:
-        print("Your past events are:")
+        print("\nYour past events are:")
         past_events = get_past_events(api, time_now, 10)
         print(events_output(past_events))
 
@@ -161,15 +162,13 @@ def main():
         print("navigate")
 
     elif value == 4:
-        keyword = input("Enter search key word:")
+        keyword = input("Enter search key word: ")
         searched_events = get_searched_event(api, keyword)
-        print(events_output(searched_events))
+        print("\n" + events_output(searched_events))
 
     elif value == 5:
-        event_id = input("Enter ID of the event you want to delete:")
-
+        event_id = input("Enter ID of the event you want to delete: ")
         delete_event(api, event_id)
-
     else:
         print("You did not enter a valid input.")
 
