@@ -88,15 +88,10 @@ def events_output(events):
         return message
         # print('No upcoming events found.')
 
-
-    
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
 
-        #Unformatted String Concatonator
-        #message += start + " " + event['summary'] + "\n" + get_reminders(event)
-
-        #Formatted the String to be more readable
+        # Formatted the String to be more readable
         message += start.replace("T", "  ").replace(":00+10:00", " (AEST)").replace(":00+11:00", " (AEDT)") + "  " + \
             event['summary'] + "\n" + get_reminders(event)
 
@@ -117,7 +112,8 @@ def get_reminders(event):
             message += reminder.get('method') + " " + str(reminder.get('minutes')) + " minutes before " \
                        + event['summary'] + ' starts' + "\n"
 
-    return message.get('items', [])
+    return message
+
 
 def get_searched_event(api, searchString):
 
@@ -138,19 +134,44 @@ def delete_event(api, event_id):
 
 
 def main():
+
+    print("Google Calendar\n"
+          "1. See Upcoming Events\n"
+          "2. See Past Events\n"
+          "3. Navigate through your Calendar\n"
+          "4. Search for an event\n"
+          "5. Delete an Event\n")
+
+    value = int(input("Enter a number based on the options available: "))
+
     api = get_calendar_api()
     time_now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
 
-    upcoming_events = get_upcoming_events(api, time_now, 10)
-    past_events = get_past_events(api, time_now, 10)
-    
-    searched_events = get_searched_event(api, "Event")
+    if value == 1:
+        print("Your upcoming events are:")
+        upcoming_events = get_upcoming_events(api, time_now, 10)
+        print(events_output(upcoming_events))
 
-    print(events_output(upcoming_events))
-    print(events_output(past_events))
-    print(events_output(searched_events))
+    elif value == 2:
+        print("Your past events are:")
+        past_events = get_past_events(api, time_now, 10)
+        print(events_output(past_events))
 
-    # delete_event(api, "2r6goo3sgplfjs5lkmgeupt5s9")
+    elif value == 3:
+        print("navigate")
+
+    elif value == 4:
+        keyword = input("Enter search key word:")
+        searched_events = get_searched_event(api, keyword)
+        print(events_output(searched_events))
+
+    elif value == 5:
+        event_id = input("Enter ID of the event you want to delete:")
+
+        delete_event(api, event_id)
+
+    else:
+        print("You did not enter a valid input.")
 
 
 if __name__ == "__main__":  # Prevents the main() function from being called by the test suite runner

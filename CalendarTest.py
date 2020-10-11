@@ -65,7 +65,7 @@ class CalendarTest(unittest.TestCase):
                 ],
             },
         }]
-        self.assertEqual("2015-05-28T09:00:00-07:00 Google I/O 2015\n", Calendar.events_output(event))
+        self.assertEqual("2015-05-28  09:00:00-07:00  Google I/O 2015\n", Calendar.events_output(event))
 
 
     def test_valid_upcoming_event_output_with_set_reminders(self):
@@ -96,7 +96,7 @@ class CalendarTest(unittest.TestCase):
                 ],
             },
         }]
-        self.assertEqual("2015-05-28T09:00:00-07:00 Google I/O 2015\n" +
+        self.assertEqual("2015-05-28  09:00:00-07:00  Google I/O 2015\n" +
                          "email 1440 minutes before Google I/O 2015 starts\n" +
                          "popup 10 minutes before Google I/O 2015 starts\n", Calendar.events_output(event))
 
