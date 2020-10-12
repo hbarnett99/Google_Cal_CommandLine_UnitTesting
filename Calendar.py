@@ -115,16 +115,16 @@ def get_reminders(event):
     return message
 
 
-def get_searched_event(api, searchString):
+def get_searched_event(api, search_string):
 
     # User Story #4
     # Allows the user to search for events via key words
     # searching for reminders yet to be implemented
     
-    if not searchString:
+    if not search_string:
         raise ValueError("Search string cannot be null. Please enter a valid search string")
 
-    search_results = api.events().list(calendarId='primary', q=searchString).execute()
+    search_results = api.events().list(calendarId='primary', q=search_string).execute()
 
     return search_results.get('items', [])
 
