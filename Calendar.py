@@ -69,7 +69,6 @@ def get_upcoming_events(api, current_time, number_of_events):
 
     # Add your methods here.
 
-
 def get_past_events(api, current_time, number_of_events):
 
     if number_of_events <= 0:
@@ -88,12 +87,17 @@ def events_output(events):
         return message
         # print('No upcoming events found.')
 
+    i = 0
+
     for event in events:
+        
+        i += 1
+
         start = event['start'].get('dateTime', event['start'].get('date'))
 
         # Formatted the String to be more readable
-        message += start.replace("T", "  ").replace(":00+10:00", " (AEST)").replace(":00+11:00", " (AEDT)") + "  " + \
-            event['summary'] + "\n" + get_reminders(event)
+        message += str(i) + ": " + start.replace("T", "  ").replace(":00+10:00", " (AEST)").replace(":00+11:00", " (AEDT)") + "  " + \
+            event['summary'] + "  (Event ID: " + event['id'] + ")\n"  + get_reminders(event)
 
         # print(start, event['summary'])
 
@@ -115,6 +119,48 @@ def get_reminders(event):
     return message
 
 
+def navigate_calendar(api, start_date, end_date):
+    
+    #Function #1 to fulfill the requirements of User Story #3
+    #Retrieves the events between a given date 
+    #Format of the date is ISO Format (YYYY-MM-DD)
+    
+    events_result = api.events().list(calendarId='primary', timeMin=start_date, timeMax=end_date,
+                                      maxResults=10, singleEvents=True,
+                                      orderBy='startTime').execute()
+
+    return events_result.get('items', [])
+
+
+def select_event_from_result(events_results, selection):
+    
+    #Function #2 to fulfill the requirements of User Story #3
+    #From the retrieved events, allows the user to select their chosen event
+    #Returns the chosen event to main to be parsed into other functions
+
+    if selection > len(events_results):
+        raise IndexError("Error: no event with number " + str(int(selection+1)))
+    elif selection < 0:
+        raise IndexError("")
+
+    selected_event = events_results[selection]
+    
+    return selected_event
+
+
+def get_event_description(event):
+
+    #Function #3 to fulfill the requirements of User Story #3
+    #Fetches and prints the description of the event parsed into the function
+
+    event_desc = event.get('description')
+
+    if not event_desc:
+        print("Event has no description")
+    else:
+        print(event_desc)
+
+
 def get_searched_event(api, search_string):
 
     # User Story #4
@@ -129,9 +175,8 @@ def get_searched_event(api, search_string):
     return search_results.get('items', [])
 
 
-def delete_event(api, event_id):
-    api.events().delete(calendarId='primary', eventId=event_id).execute()
-    
+def delete_event(api, event):
+    api.events().delete(calendarId='primary', eventId=event.get('eventId')).execute()
 
 
 def main():
@@ -143,34 +188,82 @@ def main():
           "4. Search for an event\n"
           "5. Delete an Event\n")
 
-    value = int(input("Enter a number based on the options available: "))
+    valid_bool_1 = False
 
-    api = get_calendar_api()
-    time_now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+    while not valid_bool_1:
 
-    if value == 1:
-        print("\nYour upcoming events are:")
-        upcoming_events = get_upcoming_events(api, time_now, 10)
-        print(events_output(upcoming_events))
+        value = int(input("Enter a number based on the options available: "))
 
-    elif value == 2:
-        print("\nYour past events are:")
-        past_events = get_past_events(api, time_now, 10)
-        print(events_output(past_events))
+        api = get_calendar_api()
+        time_now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
 
-    elif value == 3:
-        print("navigate")
+        if value == 1:
+            print("\nYour upcoming events are:")
+            upcoming_events = get_upcoming_events(api, time_now, 10)
+            print(events_output(upcoming_events))
+            valid_bool_1 = True
 
-    elif value == 4:
-        keyword = input("Enter search key word: ")
-        searched_events = get_searched_event(api, keyword)
-        print("\n" + events_output(searched_events))
+        elif value == 2:
+            print("\nYour past events are:")
+            past_events = get_past_events(api, time_now, 10)
+            print(events_output(past_events))
+            valid_bool_1 = True
 
-    elif value == 5:
-        event_id = input("Enter ID of the event you want to delete: ")
-        delete_event(api, event_id)
-    else:
-        print("You did not enter a valid input.")
+        elif value == 3:
+            print("Enter the start date & end date to search (ISO Format: YYYY-MM-DD))")
+
+            start_date = input("Start Date: ") + "T00:00:00.000000Z"
+            end_date = input("End Date: ") + "T23:59:59.000000Z"
+
+            navigate_results = navigate_calendar(api, start_date, end_date)
+
+            print(events_output(navigate_results))
+
+            select_value = int(input("Event no: "))-1
+
+            selected_event = select_event_from_result(navigate_results, select_value)
+
+            print("1. See Specific Details\n"
+                "2. Delete Event\n"
+                "3. Exit Navigation\n")
+
+            valid_bool_2 = False
+
+            while not valid_bool_2:
+                nav_value = int(input("Enter a number based on the options available: "))
+
+                if nav_value == 1:
+                    get_event_description(selected_event)
+                    valid_bool = True
+
+                elif nav_value == 2:
+                    delete_event(api, selected_event)
+                    valid_bool = True
+
+                elif nav_value == 3:
+                    print("See ya!")
+                    valid_bool = True
+                    exit
+                
+                else:
+                    print("You did not enter a valid input, please try again.")
+
+            valid_bool_1 = True
+
+        elif value == 4:
+            keyword = input("Enter search key word: ")
+            searched_events = get_searched_event(api, keyword)
+            print("\n" + events_output(searched_events))
+            valid_bool_1 = True
+
+        elif value == 5:
+            event_id = input("Enter ID of the event you want to delete: ")
+            delete_event(api, event_id)
+            valid_bool_1 = True
+
+        else:
+            print("You did not enter a valid input.")
+            
 
 
 if __name__ == "__main__":  # Prevents the main() function from being called by the test suite runner
