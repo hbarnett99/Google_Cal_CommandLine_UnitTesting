@@ -176,7 +176,7 @@ def get_searched_event(api, search_string):
 
 
 def delete_event(api, event):
-    api.events().delete(calendarId='primary', eventId=event.get('eventId')).execute()
+    api.events().delete(calendarId='primary', eventId=event.get('id')).execute()
 
 
 def main():
@@ -234,15 +234,15 @@ def main():
 
                 if nav_value == 1:
                     get_event_description(selected_event)
-                    valid_bool = True
+                    valid_bool_2 = True
 
                 elif nav_value == 2:
                     delete_event(api, selected_event)
-                    valid_bool = True
+                    valid_bool_2 = True
 
                 elif nav_value == 3:
                     print("See ya!")
-                    valid_bool = True
+                    valid_bool_2 = True
                     exit
                 
                 else:
