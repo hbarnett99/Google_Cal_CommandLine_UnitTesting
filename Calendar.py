@@ -177,6 +177,7 @@ def get_searched_event(api, search_string):
 
 def delete_event(api, event):
     api.events().delete(calendarId='primary', eventId=event.get('id')).execute()
+    print(event.get('summary') + " has been successfully deleted.")
 
 
 def main():
@@ -219,7 +220,7 @@ def main():
 
             print(events_output(navigate_results))
 
-            select_value = int(input("Event no: "))-1
+            select_value = int(input("Select an event: "))-1
 
             selected_event = select_event_from_result(navigate_results, select_value)
 
