@@ -63,15 +63,14 @@ class CalendarTest(unittest.TestCase):
 
         self.assertEqual(Calendar.events_output(events, mock_api), message)
 
-    # Test the case where user has not set any reminders
+
+    # This test tests the return of reminders when the default reminder is used
     @patch('Calendar.get_default_reminders', return_value=[{'method': 'popup', 'minutes': 10}])
-    def test_valid_upcoming_event_output_with_default_reminders(self, mock_get_default_reminders):
+    def test_get_reminders_when_default_is_true(self, mock_get_default_reminders):
         mock_api = Mock()
-        # mock_api.events.return_value.list.return_value.execute.return_value = {'method': 'popup', 'minutes': 10}
         event = {
-            'summary': 'Google I/O 2015',
-            'location': '800 Howard St., San Francisco, CA 94103',
-            'description': 'A chance to hear more about Google\'s developer products.',
+            'summary': 'Test Event 1',
+            'id': '12345',
             'start': {
                 'dateTime': '2015-05-28T09:00:00-07:00',
                 'timeZone': 'America/Los_Angeles',
@@ -80,13 +79,111 @@ class CalendarTest(unittest.TestCase):
                 'dateTime': '2015-05-28T17:00:00-07:00',
                 'timeZone': 'America/Los_Angeles',
             },
-            'recurrence': [
-                'RRULE:FREQ=DAILY;COUNT=2'
-            ],
-            'attendees': [
-                {'email': 'lpage@example.com'},
-                {'email': 'sbrin@example.com'},
-            ],
+            'reminders': {
+                'useDefault': True,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
+
+        message = "Reminders for Test Event 1:\n"\
+                    " - popup 10 minutes before\n"
+        self.assertEqual(Calendar.get_reminders(event, mock_api), message)  
+
+    # This test tests the return of reminders when user set reminders are used
+    def test_get_reminders_when_default_is_false(self):
+        mock_api = Mock()
+        event = {
+            'summary': 'Test Event 1',
+            'id': '12345',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
+
+        message = "Reminders for Test Event 1:\n"\
+                    " - email 1440 minutes before\n"\
+                    " - popup 10 minutes before\n"
+        self.assertEqual(Calendar.get_reminders(event, mock_api), message)  
+
+
+    @patch('Calendar.get_reminders', return_value=' - popup 10 mins before')
+    def test_events_output_format(self, mock_get_reminders):
+        mock_api = Mock();
+
+        events = [{
+            'summary': 'Test Event 1',
+            'id': '12345',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': True,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }, {
+            'summary': 'Test Event 2',
+            'id': '23456',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': True,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }]
+
+        message = "1: 2015-05-28  09:00:00-07:00  Test Event 1  (Event ID: 12345)\n"\
+                      " - popup 10 mins before\n"\
+                      "2: 2015-05-28  09:00:00-07:00  Test Event 2  (Event ID: 23456)\n"\
+                      " - popup 10 mins before\n"
+        self.assertEqual(Calendar.events_output(events, mock_api), message)
+
+    # Test the case where user has not set any reminders
+    @patch('Calendar.get_default_reminders', return_value=[{'method': 'popup', 'minutes': 10}])
+    def test_valid_upcoming_event_output_with_default_reminders(self, mock_get_default_reminders):
+        mock_api = Mock()
+        # mock_api.events.return_value.list.return_value.execute.return_value = {'method': 'popup', 'minutes': 10}
+        event = {
+            'summary': 'Google I/O 2015',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
             'reminders': {
                 'useDefault': True,
                 'overrides': [
@@ -103,8 +200,6 @@ class CalendarTest(unittest.TestCase):
         mock_api = Mock()
         event = {
             'summary': 'Google I/O 2015',
-            'location': '800 Howard St., San Francisco, CA 94103',
-            'description': 'A chance to hear more about Google\'s developer products.',
             'start': {
                 'dateTime': '2015-05-28T09:00:00-07:00',
                 'timeZone': 'America/Los_Angeles',
@@ -113,13 +208,6 @@ class CalendarTest(unittest.TestCase):
                 'dateTime': '2015-05-28T17:00:00-07:00',
                 'timeZone': 'America/Los_Angeles',
             },
-            'recurrence': [
-                'RRULE:FREQ=DAILY;COUNT=2'
-            ],
-            'attendees': [
-                {'email': 'lpage@example.com'},
-                {'email': 'sbrin@example.com'},
-            ],
             'reminders': {
                 'useDefault': False,
                 'overrides': [
@@ -132,7 +220,10 @@ class CalendarTest(unittest.TestCase):
                          " - email 1440 minutes before\n" +
                          " - popup 10 minutes before\n", Calendar.get_reminders(event, mock_api))
 
+
     
+    
+
 
 def main():
     # Create the test suite from the cases above.
