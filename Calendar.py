@@ -80,7 +80,7 @@ def get_past_events(api, current_time, number_of_events):
     return events_result.get('items', [])
 
 
-def events_output(events):
+def events_output(events, api):
     message = ""
     if not events:
         message = 'No upcoming events found.'
@@ -97,27 +97,34 @@ def events_output(events):
 
         # Formatted the String to be more readable
         message += str(i) + ": " + start.replace("T", "  ").replace(":00+10:00", " (AEST)").replace(":00+11:00", " (AEDT)") + "  " + \
-            event['summary'] + "  (Event ID: " + event['id'] + ")\n"  + get_reminders(event)
+            event['summary'] + "  (Event ID: " + event['id'] + ")\n"  + get_reminders(event, api) + "\n"
 
         # print(start, event['summary'])
 
     return message
 
 
-def get_reminders(event):
-    reminders = event.get('reminders', []).get('overrides')
-    message = ""
-    if not reminders or event.get('reminders', []).get('useDefault') is True:
+def get_default_reminders(api):
+    events = api.events().list(calendarId='primary').execute()
+    reminders = events.get('defaultReminders', [])
+    return reminders
 
-        # message = "default reminder"
-        return message
+
+def get_reminders(event, api):
+    reminders = []
+    message = "Reminders for " + event['summary'] + ":\n"
+    if event.get('reminders', []).get('useDefault') is True:
+        
+        reminders = get_default_reminders(api)
+
     else:
-        for reminder in reminders:
-            message += reminder.get('method') + " " + str(reminder.get('minutes')) + " minutes before " \
-                       + event['summary'] + ' starts' + "\n"
+        reminders = event.get('reminders', []).get('overrides')
+
+    for reminder in reminders:
+        message += " - " + reminder.get('method') + " " + str(reminder.get('minutes')) + " minutes before\n"
 
     return message
-
+    
 
 def navigate_calendar(api, start_date, end_date):
     
@@ -201,13 +208,13 @@ def main():
         if value == 1:
             print("\nYour upcoming events are:")
             upcoming_events = get_upcoming_events(api, time_now, 10)
-            print(events_output(upcoming_events))
+            print(events_output(upcoming_events, api))
             valid_bool_1 = True
 
         elif value == 2:
             print("\nYour past events are:")
             past_events = get_past_events(api, time_now, 10)
-            print(events_output(past_events))
+            print(events_output(past_events, api))
             valid_bool_1 = True
 
         elif value == 3:
@@ -218,7 +225,7 @@ def main():
 
             navigate_results = navigate_calendar(api, start_date, end_date)
 
-            print(events_output(navigate_results))
+            print(events_output(navigate_results, api))
 
             select_value = int(input("Select an event: "))-1
 
@@ -254,7 +261,7 @@ def main():
         elif value == 4:
             keyword = input("Enter search key word: ")
             searched_events = get_searched_event(api, keyword)
-            print("\n" + events_output(searched_events))
+            print("\n" + events_output(searched_events, api))
             valid_bool_1 = True
 
         elif value == 5:
