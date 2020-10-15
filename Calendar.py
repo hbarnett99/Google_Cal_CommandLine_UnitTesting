@@ -26,7 +26,7 @@ from google.auth.transport.requests import Request
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 
-def get_calendar_api():
+def get_calendar_api():  # pragma: no cover
     """
     Get an object which allows you to consume the Google Calendar API.
     You do not need to worry about what this function exactly does, nor create test cases for it.
@@ -185,7 +185,7 @@ def get_event_description(event):
         print(event_desc)
 
 
-def get_searched_event(api, search_string):
+def get_searched_event(api, search_string): 
 
     # User Story #4
     # Allows the user to search for events via key words
@@ -215,7 +215,7 @@ def delete_event(api, event):
     return check_success
 
 
-def main():
+def main():  # pragma: no cover
 
     print("Google Calendar\n"
           "1. See Upcoming Events\n"

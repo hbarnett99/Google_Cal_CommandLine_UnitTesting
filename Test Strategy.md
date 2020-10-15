@@ -21,3 +21,7 @@ A lot of the function's CFGs look the same as they are all built very similarly,
         return search_results.get('items', [])`
 
 From this, fairly uniform tests can be built, and are likely to only require two tests each. One to see if it behaves as expected with a correct variable parsed in, and another with an invalid variable to see if the raised error is reached. 
+
+For coverage reporting, ___main():___ and ___get_calendar_api():___ have been ignored with the following comment, which can be found next to each of the above functions.
+
+    # pragma: no cover
