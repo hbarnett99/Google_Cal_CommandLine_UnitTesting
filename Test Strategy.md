@@ -5,11 +5,14 @@
 
 # [Check here for a Sytax guide to writing Markdown file](https://www.markdownguide.org/basic-syntax/)
 
-Current [Lucid chart](https://app.lucidchart.com/invitations/accept/5c0e83f4-3b4b-4e0e-90d2-eb00f4e7fe7f) for program CFG
+### Current [Lucid chart](https://app.lucidchart.com/invitations/accept/5c0e83f4-3b4b-4e0e-90d2-eb00f4e7fe7f) for program CFG
+
+CFGs were chosen to base test cases on as functions rarely had multiple conditions, making an MC/DC table feel redunant. An MC/DC table also does not show a function's loop as well as a CFG does, making a CFG the ideal methodology to plan our tests around.
 
 A lot of the function's CFGs look the same as they are all built very similarly, first checking for an error to be raised. Example
 
-    def get_searched_event(api, search_string):
+## Function Example
+        def get_searched_event(api, search_string):
         if not search_string:
             raise ValueError("Search string cannot be null. Please enter a valid search string")
 

@@ -55,10 +55,10 @@ def get_calendar_api():
 
 
 def get_upcoming_events(api, current_time, number_of_events):
-    """
-    Shows basic usage of the Google Calendar API.
-    Prints the start and name of the next n events on the user's calendar.
-    """
+
+    # Shows basic usage of the Google Calendar API.
+    # Prints the start and name of the next n events on the user's calendar.
+
     if number_of_events <= 0:
         raise ValueError("Number of events must be at least 1.")
 
@@ -69,7 +69,10 @@ def get_upcoming_events(api, current_time, number_of_events):
 
     # Add your methods here.
 
+
 def get_past_events(api, current_time, number_of_events):
+
+    # Prints the start and name of the previous n events on the user's calendar.
 
     if number_of_events <= 0:
         raise ValueError("Number of events must be at least 1.")
@@ -81,6 +84,9 @@ def get_past_events(api, current_time, number_of_events):
 
 
 def events_output(events, api):
+
+    #Prints the array of events that have been parsed in
+
     message = ""
     if not events:
         message = 'No upcoming events found.'
@@ -90,14 +96,15 @@ def events_output(events, api):
     i = 0
 
     for event in events:
-        
+
         i += 1
 
         start = event['start'].get('dateTime', event['start'].get('date'))
 
         # Formatted the String to be more readable
         message += str(i) + ": " + start.replace("T", "  ").replace(":00+10:00", " (AEST)").replace(":00+11:00", " (AEDT)") + "  " + \
-            event['summary'] + "  (Event ID: " + event['id'] + ")\n"  + get_reminders(event, api) + "\n"
+            event['summary'] + "  (Event ID: " + event['id'] + \
+            ")\n" + get_reminders(event, api) + "\n"
 
         # print(start, event['summary'])
 
@@ -105,33 +112,43 @@ def events_output(events, api):
 
 
 def get_default_reminders(api):
+
+    # The function will print the default reminder if no custom reminder was found
+    # Called whenever get_reminders cannot find any custom reminders
+
     events = api.events().list(calendarId='primary').execute()
     reminders = events.get('defaultReminders', [])
     return reminders
 
 
 def get_reminders(event, api):
+
+    # This function will retrieve and print any upcoming reminders for events
+    # It is called whenever events_output prints an event
+
     reminders = []
     message = "Reminders for " + event['summary'] + ":\n"
     if event.get('reminders', []).get('useDefault') is True:
-        
+
         reminders = get_default_reminders(api)
 
     else:
         reminders = event.get('reminders', []).get('overrides')
 
     for reminder in reminders:
-        message += " - " + reminder.get('method') + " " + str(reminder.get('minutes')) + " minutes before\n"
+        message += " - " + \
+            reminder.get('method') + " " + \
+            str(reminder.get('minutes')) + " minutes before\n"
 
     return message
-    
+
 
 def navigate_calendar(api, start_date, end_date):
-    
-    #Function #1 to fulfill the requirements of User Story #3
-    #Retrieves the events between a given date 
-    #Format of the date is ISO Format (YYYY-MM-DD)
-    
+
+    # Function #1 to fulfill the requirements of User Story #3
+    # Retrieves the events between a given date
+    # Format of the date is ISO Format (YYYY-MM-DD)
+
     events_result = api.events().list(calendarId='primary', timeMin=start_date, timeMax=end_date, singleEvents=True,
                                       orderBy='startTime').execute()
 
@@ -139,25 +156,26 @@ def navigate_calendar(api, start_date, end_date):
 
 
 def select_event_from_result(events_results, selection):
-    
-    #Function #2 to fulfill the requirements of User Story #3
-    #From the retrieved events, allows the user to select their chosen event
-    #Returns the chosen event to main to be parsed into other functions
+
+    # Function #2 to fulfill the requirements of User Story #3
+    # From the retrieved events, allows the user to select their chosen event
+    # Returns the chosen event to main to be parsed into other functions
 
     selection -= 1
 
     if selection > len(events_results)-1 or selection < 0:
-        raise IndexError("Error: no event with number " + str(int(selection+1)))
+        raise IndexError("Error: no event with number " +
+                         str(int(selection+1)))
 
     selected_event = events_results[selection]
-    
+
     return selected_event
 
 
 def get_event_description(event):
 
-    #Function #3 to fulfill the requirements of User Story #3
-    #Fetches and prints the description of the event parsed into the function
+    # Function #3 to fulfill the requirements of User Story #3
+    # Fetches and prints the description of the event parsed into the function
 
     event_desc = event.get('description')
 
@@ -172,9 +190,10 @@ def get_searched_event(api, search_string):
     # User Story #4
     # Allows the user to search for events via key words
     # searching for reminders yet to be implemented
-    
+
     if not search_string:
-        raise ValueError("Search string cannot be null. Please enter a valid search string")
+        raise ValueError(
+            "Search string cannot be null. Please enter a valid search string")
 
     search_results = api.events().list(calendarId='primary', q=search_string).execute()
 
@@ -238,16 +257,18 @@ def main():
 
             select_value = int(input("Select an event: "))
 
-            selected_event = select_event_from_result(navigate_results, select_value)
+            selected_event = select_event_from_result(
+                navigate_results, select_value)
 
             print("1. See Specific Details\n"
-                "2. Delete Event\n"
-                "3. Exit Navigation\n")
+                  "2. Delete Event\n"
+                  "3. Exit Navigation\n")
 
             valid_bool_2 = False
 
             while not valid_bool_2:
-                nav_value = int(input("Enter a number based on the options available: "))
+                nav_value = int(
+                    input("Enter a number based on the options available: "))
 
                 if nav_value == 1:
                     get_event_description(selected_event)
@@ -261,7 +282,7 @@ def main():
                     print("See ya!")
                     valid_bool_2 = True
                     exit
-                
+
                 else:
                     print("You did not enter a valid input, please try again.")
 
@@ -280,10 +301,7 @@ def main():
 
         else:
             print("You did not enter a valid input.")
-            
 
 
 if __name__ == "__main__":  # Prevents the main() function from being called by the test suite runner
     main()
-
-
