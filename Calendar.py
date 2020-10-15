@@ -182,8 +182,18 @@ def get_searched_event(api, search_string):
 
 
 def delete_event(api, event):
-    api.events().delete(calendarId='primary', eventId=event.get('id')).execute()
-    print(event.get('summary') + " has been successfully deleted.")
+    # api.events().delete(calendarId='primary', eventId=event.get('id')).execute()
+    # print(event.get('summary') + " has been successfully deleted.")
+
+    check_success = False
+
+    try:
+        api.events().delete(calendarId='primary', eventId=event.get('id')).execute()
+        check_success = True
+    except TypeError:
+        print("No event found in API with given event ID")
+
+    return check_success
 
 
 def main():

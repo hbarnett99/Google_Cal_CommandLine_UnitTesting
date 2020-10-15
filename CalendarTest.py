@@ -370,7 +370,45 @@ class UserStory4_CalendarTest(unittest.TestCase):
 
 
 class UserStory5_CalendarTest(unittest.TestCase):
-    print("Yet to implement tests for User Story #5")
+    
+    def test_delete_event(self):
+        mock_api = Mock()
+
+        event = {
+            'summary': 'Test Event 1',
+            'id': '12345',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': True,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
+
+        self.assertEqual(Calendar.delete_event(mock_api, event), True)
+
+    def test_delete_event_bad_event(self):
+        mock_api = Mock()
+
+        # bad_event = {'table': '22'}
+
+        # with self.assertRaises(ValueError):
+        #     (Calendar.get_searched_event(mock_api, bad_event), True)
+
+
+        # with self.assertRaises(TypeError):
+        #     (Calendar.delete_event(mock_api, bad_event),
+        #      "No event found in API with given event ID")
+
 
 def main():
     # Create the test suite from the cases above.
