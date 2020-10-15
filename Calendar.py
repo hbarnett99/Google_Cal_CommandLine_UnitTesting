@@ -132,8 +132,7 @@ def navigate_calendar(api, start_date, end_date):
     #Retrieves the events between a given date 
     #Format of the date is ISO Format (YYYY-MM-DD)
     
-    events_result = api.events().list(calendarId='primary', timeMin=start_date, timeMax=end_date,
-                                      maxResults=10, singleEvents=True,
+    events_result = api.events().list(calendarId='primary', timeMin=start_date, timeMax=end_date, singleEvents=True,
                                       orderBy='startTime').execute()
 
     return events_result.get('items', [])

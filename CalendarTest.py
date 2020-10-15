@@ -63,6 +63,8 @@ class CalendarTest(unittest.TestCase):
 
         self.assertEqual(Calendar.events_output(events, mock_api), message)
 
+        
+
 
     # This test tests the return of reminders when the default reminder is used
     @patch('Calendar.get_default_reminders', return_value=[{'method': 'popup', 'minutes': 10}])
@@ -220,10 +222,53 @@ class CalendarTest(unittest.TestCase):
                          " - email 1440 minutes before\n" +
                          " - popup 10 minutes before\n", Calendar.get_reminders(event, mock_api))
 
+   #The following tests test User Story #3 - Navigate calendar
+    def test_navigate_calendar_valid(self):
+        start_date = "2020-10-10T00:00:00.000000Z"
+        end_date = "2020-11-11T23:59:59.000000Z"
+        
+        mock_api = Mock()
 
-    
-    
+        events = Calendar.navigate_calendar(mock_api, start_date, end_date)
 
+        self.assertEqual(
+            mock_api.events.return_value.list.return_value.execute.return_value.get.call_count, 1)
+
+        args, kwargs = mock_api.events.return_value.list.call_args_list[0]
+        self.assertEqual(kwargs['timeMin'], start_date)
+        self.assertEqual(kwargs['timeMax'], end_date)
+
+
+    #def test_select_event_from_result(self):
+        
+        
+
+
+    #The following tests test User Story #4 - Search events
+
+    # @patch('Calendar.get_searched_event', return_value=[{"Example"}])
+    def test_get_searched_event_with_query(self):
+        query = "Search Query"
+        mock_api = Mock()
+
+        events = Calendar.get_searched_event(mock_api, query)
+
+        self.assertEqual(
+            mock_api.events.return_value.list.return_value.execute.return_value.get.call_count, 1)
+
+        args, kwargs = mock_api.events.return_value.list.call_args_list[0]
+        self.assertEqual(kwargs['q'], query)
+
+
+    def test_get_searched_event_with_empty_query(self):
+        query = ""
+        mock_api = Mock()
+
+        message = "Search string cannot be null. Please enter a valid search string"
+
+        with self.assertRaises(ValueError):
+            (Calendar.get_searched_event(mock_api, query), message)
+        
 
 def main():
     # Create the test suite from the cases above.
