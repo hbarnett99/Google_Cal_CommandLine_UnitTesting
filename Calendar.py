@@ -144,10 +144,10 @@ def select_event_from_result(events_results, selection):
     #From the retrieved events, allows the user to select their chosen event
     #Returns the chosen event to main to be parsed into other functions
 
-    if selection > len(events_results):
+    selection -= 1
+
+    if selection > len(events_results)-1 or selection < 0:
         raise IndexError("Error: no event with number " + str(int(selection+1)))
-    elif selection < 0:
-        raise IndexError("")
 
     selected_event = events_results[selection]
     
@@ -226,7 +226,7 @@ def main():
 
             print(events_output(navigate_results, api))
 
-            select_value = int(input("Select an event: "))-1
+            select_value = int(input("Select an event: "))
 
             selected_event = select_event_from_result(navigate_results, select_value)
 

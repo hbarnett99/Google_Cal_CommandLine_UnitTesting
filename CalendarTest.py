@@ -239,9 +239,104 @@ class CalendarTest(unittest.TestCase):
         self.assertEqual(kwargs['timeMax'], end_date)
 
 
-    #def test_select_event_from_result(self):
+    def test_select_event_from_result(self):
+
+        event_1 = {
+            'summary': 'Test Event 1',
+            'id': '12345',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': True,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
         
+        event_2 = {
+            'summary': 'Test Event 2',
+            'id': '23456',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                  'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': True,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
+
+        event_list = [event_1, event_2]
+        selection_number = 2
+        mock_api = Mock()
+
+        self.assertEqual(Calendar.select_event_from_result(event_list, selection_number), event_2)
+
         
+
+    def test_select_event_from_result_invalid_number(self):
+
+        event_1 = {
+            'summary': 'Test Event 1',
+            'id': '12345',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': True,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
+
+        event_2 = {
+            'summary': 'Test Event 2',
+            'id': '23456',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                    'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': True,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
+
+        event_list = [event_1, event_2]
+        selection_number = 200
+        message = "Error: no event with number " + str(int(selection_number+1))
+
+        with self.assertRaises(IndexError):
+            (Calendar.select_event_from_result(event_list, selection_number), message)
 
 
     #The following tests test User Story #4 - Search events
