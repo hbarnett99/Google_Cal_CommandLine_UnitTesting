@@ -8,6 +8,9 @@ import Calendar
 class Miscellaneous_CalendarTest(unittest.TestCase):
 
     # Test the output in the case where no events are found in the given period
+
+    # Mock is used to create a fake API that is required to be parsed into each function in order to fetch events
+
     def test_no_events_returned(self):
         events = []
         message = "No upcoming events found.\n"
@@ -190,6 +193,9 @@ class UserStory1_CalendarTest(unittest.TestCase):
 
     # This test tests the number of past events.
     def test_get_past_events_number(self):
+
+        # Mock is used to create a fake API to act as the Google Calendar API to search for past events
+
         num_events = 2
         time = "2020-08-03T00:00:00.000000Z"
 
@@ -204,6 +210,9 @@ class UserStory1_CalendarTest(unittest.TestCase):
 
     # This tests that an error is thrown when the number of events passed is zero.
     def test_get_past_events_number_zero(self):
+
+        # Mock is used to create a fake API to act as the Google Calendar API to search for past events (or a lack of)
+
         num_events = 0
         time = "2020-08-03T00:00:00.000000Z"
 
@@ -216,6 +225,9 @@ class UserStory2_CalendarTest(unittest.TestCase):
 
     # This test tests number of upcoming events.
     def test_get_upcoming_events_number(self):
+
+        # Mock is used to create a fake API to act as the Google Calendar API to search for upcoming events
+
         num_events = 2
         time = "2020-08-03T00:00:00.000000Z"
 
@@ -230,6 +242,9 @@ class UserStory2_CalendarTest(unittest.TestCase):
 
     # This tests that an error is thrown when the number of events passed is zero.
     def test_get_upcoming_events_number_zero(self):
+
+        # Mock is used to create a fake API to act as the Google Calendar API to search for upcoming events (or a lack of)
+
         num_events = 0
         time = "2020-08-03T00:00:00.000000Z"
 
@@ -238,61 +253,13 @@ class UserStory2_CalendarTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             Calendar.get_upcoming_events(mock_api, time, num_events)
 
-    # Test the case where user has not set any reminders
-    @patch('Calendar.get_default_reminders', return_value=[{'method': 'popup', 'minutes': 10}])
-    def test_valid_upcoming_event_output_with_default_reminders(self, mock_get_default_reminders):
-        mock_api = Mock()
-        # mock_api.events.return_value.list.return_value.execute.return_value = {'method': 'popup', 'minutes': 10}
-        event = {
-            'summary': 'Google I/O 2015',
-            'start': {
-                'dateTime': '2015-05-28T09:00:00-07:00',
-                'timeZone': 'America/Los_Angeles',
-            },
-            'end': {
-                'dateTime': '2015-05-28T17:00:00-07:00',
-                'timeZone': 'America/Los_Angeles',
-            },
-            'reminders': {
-                'useDefault': True,
-                'overrides': [
-                    {'method': 'email', 'minutes': 24 * 60},
-                    {'method': 'popup', 'minutes': 10},
-                ],
-            },
-        }
-        self.assertEqual("Reminders for Google I/O 2015:\n"
-                        " - popup 10 minutes before\n", Calendar.get_reminders(event, mock_api))
-
-    # Test that all set reminders are returned if the event has user-set reminders
-    def test_valid_upcoming_event_output_with_set_reminders(self):
-        mock_api = Mock()
-        event = {
-            'summary': 'Google I/O 2015',
-            'start': {
-                'dateTime': '2015-05-28T09:00:00-07:00',
-                'timeZone': 'America/Los_Angeles',
-            },
-            'end': {
-                'dateTime': '2015-05-28T17:00:00-07:00',
-                'timeZone': 'America/Los_Angeles',
-            },
-            'reminders': {
-                'useDefault': False,
-                'overrides': [
-                    {'method': 'email', 'minutes': 24 * 60},
-                    {'method': 'popup', 'minutes': 10},
-                ],
-            },
-        }
-        self.assertEqual("Reminders for Google I/O 2015:\n"
-                        " - email 1440 minutes before\n" +
-                        " - popup 10 minutes before\n", Calendar.get_reminders(event, mock_api))
-
 class UserStory3_CalendarTest(unittest.TestCase):
     #The following tests test User Story #3 - Navigate calendar
 
     def test_navigate_calendar_valid(self):
+
+        # Mock is used to create a fake API to act as the Google Calendar API to search and return a list of events
+
         start_date = "2020-10-10"
         end_date = "2020-11-11"
 
@@ -311,7 +278,7 @@ class UserStory3_CalendarTest(unittest.TestCase):
         self.assertEqual(kwargs['timeMax'], end_date_formatted)
 
     # This test tests that an error is raised when invalid dates are entered
-    def test_invalid_date_input(self):
+    def test_navigate_calendar_invalid_date_input(self):
         start_date = "2020-10-10"
         end_date = "2020-10-09"
 
@@ -321,6 +288,10 @@ class UserStory3_CalendarTest(unittest.TestCase):
         
 
     def test_select_event_from_result(self):
+
+        # No Mock is used to as no API is used in function being tested
+        # Mock could be used for the events, however it is easier to distinguish the two using a dictionary as the function would expect in reality, as well as comparing with assertEqual
+
 
         event_1 = {
             'summary': 'Test Event 1',
@@ -364,12 +335,14 @@ class UserStory3_CalendarTest(unittest.TestCase):
 
         event_list = [event_1, event_2]
         selection_number = 2
-        mock_api = Mock()
 
         self.assertEqual(Calendar.select_event_from_result(
             event_list, selection_number), event_2)
 
     def test_select_event_from_result_invalid_number(self):
+
+        # No Mock is used to as no API is used in function being tested
+        # Mock could be used for the events, however it is easier to distinguish the two using a dictionary as the function would expect in reality, as well as comparing with assertEqual 
 
         event_1 = {
             'summary': 'Test Event 1',
@@ -421,10 +394,12 @@ class UserStory3_CalendarTest(unittest.TestCase):
 
 class UserStory4_CalendarTest(unittest.TestCase):
 
-            #The following tests test User Story #4 - Search events
+            # The following tests test User Story #4 - Search events
 
-            # @patch('Calendar.get_searched_event', return_value=[{"Example"}])
         def test_get_searched_event_with_query(self):
+
+            # Mock is used to create a fake API to act as the Google Calendar API to be searched with the given query
+            
             query = "Search Query"
             mock_api = Mock()
 
@@ -437,6 +412,9 @@ class UserStory4_CalendarTest(unittest.TestCase):
             self.assertEqual(kwargs['q'], query)
 
         def test_get_searched_event_with_empty_query(self):
+
+            # Mock is used to create a fake API to act as the Google Calendar API to be searched with the empty query
+
             query = ""
             mock_api = Mock()
 
@@ -447,6 +425,8 @@ class UserStory4_CalendarTest(unittest.TestCase):
 
 
 class UserStory5_CalendarTest(unittest.TestCase):
+
+    # Mock is used to create a fake API to act as the Google Calendar API to add, and then delete an event from
     
     def test_delete_event(self):
         mock_api = Mock()

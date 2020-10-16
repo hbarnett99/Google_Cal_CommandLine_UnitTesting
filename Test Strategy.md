@@ -34,6 +34,14 @@ Test cases should also somewhat cover the elements that have been taken to handl
 
 <br>
 
+## Mocking
+
+Mocking is used to simulate the use of the Google Calendar API, without having to work on a live information, which can be especially dangerous when modifying and deleting events. It also becomes extremely useful, allowing us to see what is expected from each of the functions created.
+
+The mock API allows us to test functions in isolation, which makes it quick, clear and concise when finding what is and is not working when testing the functions in isolation.
+
+<br>
+
  ## How Much Coverage?
 
 For coverage reporting, ___main():___ and ___get_calendar_api():___ will be ignored with the following comment, which can be found next to each of the above functions. 
@@ -47,6 +55,60 @@ For ___get_calendar_api():___, the function, it was included in the original cod
 Having ignored these, the aim is that the test suites should reach 100% coverage. At 100%, there is both complete branch coverage, giving strong confidence in the program to behave as expected. 
 
 <br>
- 
+
  ## Coverage Report
  ![Coverage](https://i.ibb.co/MZH992P/121371216-765769820822104-3375311843424163557-n.png)
+
+<br>
+
+# Test Suites
+**Tests should match the following, and no more to ensure that a minimum amount of test cases are required, while still achieving 100% statement coverage.** *However, they may be a little scrambled in their arrangement within the test code*
+
+## Miscellaneous Suite
+### Function: events_output
+- Test #1 - Test with no events returned
+- Test #2 - Test with events returned
+### Function: get_event_description
+- Test #3 - Test event with description
+- Test #4 - Test event with no description
+### Function: get_reminders
+- Test #3 - Test event with default reminders
+- Test #4 - Test event with additional (multiple) reminders
+
+<br>
+
+## Suite 1 - User Story #1
+### Function: get_past_events
+- Test #1 - Test with valid number of events
+- Test #2 - Test with no past events
+
+<br>
+
+## Suite 2 - User Story #2
+### Function: upcoming_events
+- Test #1 - Test with valid number of events
+- Test #2 - Test with no past events
+
+<br>
+
+## Suite 3 - User Story #3
+### Function: navigate_calendar
+- Test #1 - Test with valid start date and end date
+- Test #2 - Test with no valid dates, but invalid start date and end date
+### Function: select_event_from_result
+- Test #1 - Test with valid number to select event
+- Test #2 - Test with number out of bounds of the event list
+
+<br>
+
+## Suite 4 - User Story #4
+### Function: get_searched_event
+- Test #1 - Test with a valid search query
+- Test #2 - Test with an empty search query
+
+<br>
+
+## Suite 5 - User Story #5
+### Function: delete_event
+- Test #1 - Test with an event to delete
+- *note that no other tests were completed for this, as the way the code is written a valid event is found, therefore the user cannot parse an event that does not exist within the API*
