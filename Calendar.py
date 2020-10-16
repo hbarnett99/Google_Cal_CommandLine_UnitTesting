@@ -54,7 +54,7 @@ def get_calendar_api():  # pragma: no cover
     return build('calendar', 'v3', credentials=creds)
 
 
-def get_upcoming_events(api, current_time, number_of_events):
+def get_upcoming_events(api, current_time, number_of_events): 
 
     # Shows basic usage of the Google Calendar API.
     # Prints the start and name of the next n events on the user's calendar.
@@ -70,7 +70,7 @@ def get_upcoming_events(api, current_time, number_of_events):
     # Add your methods here.
 
 
-def get_past_events(api, current_time, number_of_events):
+def get_past_events(api, current_time, number_of_events): 
 
     # Prints the start and name of the previous n events on the user's calendar.
 
@@ -83,7 +83,7 @@ def get_past_events(api, current_time, number_of_events):
     return events_result.get('items', [])
 
 
-def events_output(events, api):
+def events_output(events, api): 
 
     #Prints the array of events that have been parsed in
 
@@ -111,7 +111,7 @@ def events_output(events, api):
     return message
 
 
-def get_default_reminders(api):
+def get_default_reminders(api): 
 
     # The function will print the default reminder if no custom reminder was found
     # Called whenever get_reminders cannot find any custom reminders
@@ -121,7 +121,7 @@ def get_default_reminders(api):
     return reminders
 
 
-def get_reminders(event, api):
+def get_reminders(event, api): 
 
     # This function will retrieve and print any upcoming reminders for events
     # It is called whenever events_output prints an event
@@ -143,7 +143,7 @@ def get_reminders(event, api):
     return message
 
 
-def navigate_calendar(api, start_date, end_date):
+def navigate_calendar(api, start_date, end_date): 
 
     # Function #1 to fulfill the requirements of User Story #3
     # Retrieves the events between a given date
@@ -165,7 +165,7 @@ def navigate_calendar(api, start_date, end_date):
     return events_result.get('items', [])
 
 
-def select_event_from_result(events_results, selection):
+def select_event_from_result(events_results, selection): 
 
     # Function #2 to fulfill the requirements of User Story #3
     # From the retrieved events, allows the user to select their chosen event
@@ -182,7 +182,7 @@ def select_event_from_result(events_results, selection):
     return selected_event
 
 
-def get_event_description(event):
+def get_event_description(event): 
 
     # Function #3 to fulfill the requirements of User Story #3
     # Fetches and prints the description of the event parsed into the function
@@ -190,9 +190,11 @@ def get_event_description(event):
     event_desc = event.get('description')
 
     if not event_desc:
-        print("Event has no description\n")
+        # print("Event has no description\n")
+        return "Event has no description\n"
     else:
-        print(event_desc)
+        # print(event_desc)
+        return event_desc
 
 
 def get_searched_event(api, search_string): 
@@ -210,15 +212,11 @@ def get_searched_event(api, search_string):
     return search_results.get('items', [])
 
 
-def delete_event(api, event):
+def delete_event(api, event): 
 
-    check_success = False
-
-    try:
-        api.events().delete(calendarId='primary', eventId=event.get('id')).execute()
-        check_success = True
-    except TypeError:
-        print("The given event was not found in the Calendar.\n")
+    api.events().delete(calendarId='primary', eventId=event.get('id')).execute()
+    check_success = True
+    
 
     return check_success
 
@@ -282,7 +280,8 @@ def main():  # pragma: no cover
                         input("Enter a number based on the options available: "))
 
                     if nav_value == 1:
-                        get_event_description(selected_event)
+                        description = get_event_description(selected_event)
+                        print(description)
                         valid_bool_2 = True
 
                     elif nav_value == 2:
@@ -316,5 +315,5 @@ def main():  # pragma: no cover
                 print("You did not enter a valid input.")
 
 
-if __name__ == "__main__":  # Prevents the main() function from being called by the test suite runner
+if __name__ == "__main__":  # pragma: no cover # Prevents the main() function from being called by the test suite runner
     main()

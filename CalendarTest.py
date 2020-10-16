@@ -16,6 +16,20 @@ class Miscellaneous_CalendarTest(unittest.TestCase):
 
         self.assertEqual(Calendar.events_output(events, mock_api), message)
 
+    def test_get_default_reminder_function_output(self):
+        mock_api = Mock()
+        mock_api.events.return_value.list.return_value.execute.return_value = {
+            "defaultReminders":[
+                {
+                "method": "Email",
+                "minutes": 10
+                }
+            ]
+        }
+
+        default = [{"method": "Email", "minutes": 10}]
+
+        self.assertEqual(Calendar.get_default_reminders(mock_api), default)
 
     # This test tests the return of reminders when the default reminder is used
     @patch('Calendar.get_default_reminders', return_value=[{'method': 'popup', 'minutes': 10}])
@@ -121,6 +135,56 @@ class Miscellaneous_CalendarTest(unittest.TestCase):
                       "2: 2015-05-28  09:00:00-07:00  Test Event 2  (Event ID: 23456)\n"\
                       " - popup 10 mins before\n"
         self.assertEqual(Calendar.events_output(events, mock_api), message)
+
+    # This test tests the return when the event does not have a description
+    def test_get_event_description_none(self):
+
+        event = {
+            'summary': 'Test Event 1',
+            'id': '12345',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
+
+        self.assertEqual(Calendar.get_event_description(event), "Event has no description\n")
+
+    # This test tests the return when the event has a description
+    def test_get_event_with_description(self):
+        event = {
+            'summary': 'Test Event 1',
+            'id': '12345',
+            'description': 'Test Description',
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
+
+        self.assertEqual(Calendar.get_event_description(event), "Test Description")
 
 class UserStory1_CalendarTest(unittest.TestCase):
 
