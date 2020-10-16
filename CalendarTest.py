@@ -10,7 +10,7 @@ class Miscellaneous_CalendarTest(unittest.TestCase):
     # Test the output in the case where no events are found in the given period
     def test_no_events_returned(self):
         events = []
-        message = "No upcoming events found."
+        message = "No upcoming events found.\n"
 
         mock_api = Mock()
 
@@ -229,8 +229,11 @@ class UserStory3_CalendarTest(unittest.TestCase):
     #The following tests test User Story #3 - Navigate calendar
 
     def test_navigate_calendar_valid(self):
-        start_date = "2020-10-10T00:00:00.000000Z"
-        end_date = "2020-11-11T23:59:59.000000Z"
+        start_date = "2020-10-10"
+        end_date = "2020-11-11"
+
+        start_date_formatted = "2020-10-10T00:00:00.000000Z"
+        end_date_formatted = "2020-11-11T23:59:59.000000Z"
 
         mock_api = Mock()
 
@@ -240,8 +243,18 @@ class UserStory3_CalendarTest(unittest.TestCase):
             mock_api.events.return_value.list.return_value.execute.return_value.get.call_count, 1)
 
         args, kwargs = mock_api.events.return_value.list.call_args_list[0]
-        self.assertEqual(kwargs['timeMin'], start_date)
-        self.assertEqual(kwargs['timeMax'], end_date)
+        self.assertEqual(kwargs['timeMin'], start_date_formatted)
+        self.assertEqual(kwargs['timeMax'], end_date_formatted)
+
+    # This test tests that an error is raised when invalid dates are entered
+    def test_invalid_date_input(self):
+        start_date = "2020-10-10"
+        end_date = "2020-10-09"
+
+        mock_api = Mock()
+        with self.assertRaises(IndexError):
+            (Calendar.navigate_calendar(mock_api, start_date, end_date))
+        
 
     def test_select_event_from_result(self):
 
@@ -395,19 +408,6 @@ class UserStory5_CalendarTest(unittest.TestCase):
         }
 
         self.assertEqual(Calendar.delete_event(mock_api, event), True)
-
-    def test_delete_event_bad_event(self):
-        mock_api = Mock()
-
-        # bad_event = {'table': '22'}
-
-        # with self.assertRaises(ValueError):
-        #     (Calendar.get_searched_event(mock_api, bad_event), True)
-
-
-        # with self.assertRaises(TypeError):
-        #     (Calendar.delete_event(mock_api, bad_event),
-        #      "No event found in API with given event ID")
 
 
 def main():
