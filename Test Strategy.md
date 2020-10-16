@@ -22,6 +22,10 @@ A lot of the function's CFGs look the same as they are all built very similarly,
 
 From this, fairly uniform tests can be built, and are likely to only require two tests each. One to see if it behaves as expected with a correct variable parsed in, and another with an invalid variable to see if the raised error is reached. 
 
-For coverage reporting, ___main():___ and ___get_calendar_api():___ have been ignored with the following comment, which can be found next to each of the above functions.
+For coverage reporting, ___main():___ and ___get_calendar_api():___ have been ignored with the following comment, which can be found next to each of the above functions. 
 
     # pragma: no cover
+
+As per Najam, any logic regarding UI or program interface is not required. This is all kept in ___main():___. 
+
+For ___get_calendar_api():___, the function, it was included in the original code provided to us, and therefore is not required to be tested.
